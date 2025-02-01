@@ -1,0 +1,43 @@
+version: '3'
+services:
+  node1:
+    build: ../backend
+    ports:
+      - "8080:8080"
+    environment:
+      - NODE_ID=node1
+      - RAFT_ADDRESS=node1:9090
+      - RAFT_PORT=9090
+      - HTTP_PORT=8080
+      - RAFT_PEERS=node1:9090,node2:9090,node3:9090  # List all nodes
+
+  node2:
+    build: ../backend
+    ports:
+      - "8081:8080"
+    environment:
+      - NODE_ID=node2
+      - RAFT_ADDRESS=node2:9090
+      - RAFT_PORT=9090
+      - HTTP_PORT=8080
+      - RAFT_PEERS=node1:9090,node2:9090,node3:9090  # Same list for all nodes
+
+  node3:
+    build: ../backend
+    ports:
+      - "8082:8080"
+    environment:
+      - NODE_ID=node3
+      - RAFT_ADDRESS=node3:9090
+      - RAFT_PORT=9090
+      - HTTP_PORT=8080
+      - RAFT_PEERS=node1:9090,node2:9090,node3:9090  # Same list for all nodes
+
+  ui:
+    build: ../frontend
+    ports:
+      - "3000:3000"
+    depends_on:
+      - node1
+      - node2
+      - node3
