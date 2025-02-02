@@ -1,10 +1,6 @@
 # Distributed Key-Value Store  
 
-A fault-tolerant key-value storage system using **Raft consensus** with:  
-✅ 3-node cluster (Go backend)  
-✅ Leader election & log replication  
-✅ React web UI  
-✅ Auto-redirect writes to leader  
+A fault-tolerant key-value storage system using **Raft consensus**
 
 ## Run with Docker  
 ```bash
