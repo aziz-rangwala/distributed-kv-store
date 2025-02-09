@@ -46,15 +46,18 @@ func (s *Server) handleSet(w http.ResponseWriter, r *http.Request) {
         return
     }
 
-    if s.store == nil {
-        log.Println("Store is nil")
-        http.Error(w, "Internal server error", http.StatusInternalServerError)
+    // Serialize the command to be applied via Raft.
+    command := map[string]string{"op": "set", "key": req.Key, "value": req.Value}
+    commandBytes, err := json.Marshal(command)
+    if err != nil {
+        http.Error(w, "Command marshal error", http.StatusInternalServerError)
         return
     }
 
-    if err := s.store.Set(req.Key, req.Value); err != nil {
-        log.Printf("Failed to set key-value pair: %v", err)
-        http.Error(w, err.Error(), http.StatusInternalServerError)
+    // Apply the command to the Raft cluster.
+    applyFuture := s.raft.Apply(commandBytes, 5*time.Second)
+    if err := applyFuture.Error(); err != nil {
+        http.Error(w, fmt.Sprintf("Failed to apply command: %v", err), http.StatusInternalServerError)
         return
     }
 
